@@ -1,0 +1,22 @@
+# Source-only release: exclude any subsequently created private inputs.
+artifacts/
+vendor/
+.zcode/
+private/
+credentials/
+keys/
+*.img
+*.ipsw
+*.aea
+*.dmg
+*.im4p
+*.im4m
+*.macho
+*.bin
+*.efi
+*.pem
+*.key
+*.p12
+*.pfx
+*.log
+__pycache__/

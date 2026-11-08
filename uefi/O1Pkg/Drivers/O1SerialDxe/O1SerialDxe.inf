@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = O1SerialDxe
+  FILE_GUID      = B3786C3B-2D9B-4BE2-A6A4-7216E2CC9FB4
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 0.1
+  ENTRY_POINT    = O1SerialDxeInitialize
+
+[Sources]
+  O1SerialDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  SerialPortLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiSerialIoProtocolGuid   ## PRODUCES
+  gEfiDevicePathProtocolGuid ## PRODUCES
+
+[Depex]
+  TRUE

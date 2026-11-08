@@ -1,0 +1,70 @@
+{
+  "scope": "Explicitly reviewed BSD-licensed source modules only; not a complete firmware or iOS system",
+  "source_bytes": 37925,
+  "source_files": [
+    {
+      "path": "UniXNU-dijun-ios27/drivers/ArmCpu/ArmCpu.cpp",
+      "bytes": 15516,
+      "sha256": "bed0f0f5eff847446d044ff95b1e1ab140f3863047591f29a45e328488f4aaba",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "UniXNU-dijun-ios27/drivers/ArmCpu/Info.plist",
+      "bytes": 771,
+      "sha256": "32fd6a027cc14b497544626f96ae104cd28af8aa9b9fcbde9ef138a4b3d70547",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "UniXNU-dijun-ios27/drivers/ArmCpu/LICENSE",
+      "bytes": 2673,
+      "sha256": "9e18e2c43ae4e51da2d11fd777b5b11056476d6ba395e5e2270467dbf02d0adf",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "uefi/O1Pkg/Drivers/O1SerialDxe/O1SerialDxe.c",
+      "bytes": 5036,
+      "sha256": "47fdb79e7b5eb8eb95c409e6b195675a8038ffe5abd1f28a671befbba8c5652d",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "uefi/O1Pkg/Drivers/O1SerialDxe/O1SerialDxe.inf",
+      "bytes": 555,
+      "sha256": "d0a364852e42fa51a8bd7f0b4a553873c0c7b8a2d5fbabd3bf523a1857629095",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "uefi/O1Pkg/Library/O1SerialPortLib/O1SerialPortLib.c",
+      "bytes": 11242,
+      "sha256": "263825f4c2549126adb093fa8cef117d51b1d516a4f1795ed2aa9a1cae594281",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "uefi/O1Pkg/Library/O1SerialPortLib/O1SerialPortLib.inf",
+      "bytes": 656,
+      "sha256": "415f39d29c7d807487cb3983b93651a78e6fbdfe09f958a62aa6d5f45c0a7f5b",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    },
+    {
+      "path": "uefi/O1Pkg/Library/O1SerialPortLib/O1RamLog.h",
+      "bytes": 1476,
+      "sha256": "fa521baa49330bfdddb59ee3312059fb229769f5d7b2029a50d24ef98d99791f",
+      "license": "BSD-2-Clause-Patent",
+      "content_reviewed": true
+    }
+  ],
+  "apple_binaries_included": false,
+  "apple_machine_code_included": false,
+  "device_logs_or_identifiers_included": false,
+  "secrets_included": false,
+  "unlicensed_local_source_included": false,
+  "windows_handoff_source_included": false,
+  "standalone_firmware_rebuild_supported": false,
+  "ios_booted": false
+}

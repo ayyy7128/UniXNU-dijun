@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = O1SerialPortLib
+  FILE_GUID      = 2F0E3701-8CF5-4BF8-B3ED-ECA1B2340C40
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 0.1
+  LIBRARY_CLASS  = SerialPortLib
+
+[Sources]
+  O1SerialPortLib.c
+  O1RamLog.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  O1Pkg/O1Pkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  CacheMaintenanceLib
+  IoLib
+  PcdLib
+
+[FixedPcd]
+  gO1TokenSpaceGuid.PcdLogBase
+  gO1TokenSpaceGuid.PcdLogSize
+  gO1TokenSpaceGuid.PcdSerialBase
+  gO1TokenSpaceGuid.PcdSerialEnabled
+  gO1TokenSpaceGuid.PcdPersistentLogBase
+  gO1TokenSpaceGuid.PcdPersistentLogSize
