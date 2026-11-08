@@ -1,78 +1,78 @@
-# dijun iOS port — early source modules
+# UniXNU-dijun
 
-Experimental work toward running original mobile iOS userspace on Xiaomi 15S Pro (`dijun`, XRING O1).
+面向小米 15S Pro（`dijun`，XRING O1）的 iOS 移植实验项目，目标是运行真正的原版手机版 iOS 用户空间。
 
-**iOS has not booted. Original Apple userspace has not executed. This repository is not a flashable release and is not a complete, independently rebuildable kernel or firmware.**
+**iOS 尚未开机，原 Apple 用户空间尚未执行。本仓库不是可刷写发行版，也不包含可独立完整重建的内核或固件。**
 
-Documentation: [English status](docs/porting/dijun-source-snapshot.md) · [简体中文状态说明](docs/zh/porting/dijun-source-snapshot.md).
+文档：[简体中文进度说明](docs/zh/porting/dijun-source-snapshot.md) · [English status](docs/porting/dijun-source-snapshot.md)。
 
-## First public snapshot
+## 首批公开源码
 
-This snapshot contains eight explicitly reviewed, existing BSD-2-Clause-Patent source files:
+本快照包含八份经过逐文件审查、已有 BSD-2-Clause-Patent 许可的源码：
 
-- `UniXNU-dijun-ios27/drivers/ArmCpu/`: BSP CPU, GIC and architectural timer driver, its matching information and the original component license.
-- `uefi/O1Pkg/Drivers/O1SerialDxe/`: EFI Serial I/O protocol over the RAM-first output sink.
-- `uefi/O1Pkg/Library/O1SerialPortLib/`: reserved-RAM ring output, optional explicitly enabled UART mirroring and the log ABI definition. No captured logs are included.
+- `UniXNU-dijun-ios27/drivers/ArmCpu/`：BSP CPU、GIC 和架构定时器驱动，以及匹配信息和原组件许可。
+- `uefi/O1Pkg/Drivers/O1SerialDxe/`：基于 RAM 优先输出接口的 EFI 串口协议驱动。
+- `uefi/O1Pkg/Library/O1SerialPortLib/`：预留 RAM 环形输出、需显式启用的可选 UART 镜像，以及日志 ABI 定义。不包含实际采集的日志。
 
-The files are preserved byte-for-byte. `source-manifest.json` records their exact SHA-256 hashes and sizes. This is a limited module-source release, not the entire private integration workspace.
+这八份源文件保持逐字节不变，`source-manifest.json` 记录各自的完整 SHA-256 和大小。这是有限的模块源码发布，不是整个私有集成工作区。
 
-## Verified hardware result — 2026-11-08, test 13
+## 已验证的实机结果——2026-11-08，第 13 轮
 
-A new native arm64e kernel was tested on the same device through the continuous kernel-to-userspace attempt. The selected diagnostic collection had a complete mapping for original v1 AppleImage4 and corecrypto, no unresolved references within that selected subset, and no missing-symbol stubs. It did **not** contain the full AMFI/Sandbox security dependency closure.
+本轮在同一台设备上测试了新构建的真实 arm64e 原生内核，沿连续内核到用户空间路径尝试启动。所选诊断 collection 中，原 v1 AppleImage4 和 corecrypto 子集映射完整，没有未解析引用或缺失符号替身；但该子集**不包含完整 AMFI/Sandbox 安全依赖闭包**。
 
-The actual terminal result was:
+本轮真实终点为：
 
 ```text
 Stage83 / error 0xe802
 trust_cache_runtime_init → panic("amfi interface not available @%s:%d")
 ```
 
-The panic caller was resolved from this test's own collection, not copied from a prior result. The earlier Image4-null guard had been passed; that does not establish complete Image4 runtime ABI compatibility or acceptance of signatures.
+panic 调用点根据本轮实际 collection 核准，不是沿用上轮结果。先前的 Image4 非空检查已通过，但这不代表完整 Image4 运行时 ABI 合格，也不代表签名验收成功。
 
-The device returned to Android normally. The newly installed test boot's full device-side SHA-256 was verified and the other boot slot was unchanged. Per the test procedure, the test boot was retained: `restored=false`, `test_boot_retained=true`. No raw device identifiers, boot IDs, partition backups or captured logs are published.
+手机正常返回 Android。设备端完整新测试 boot 的 SHA-256 验证通过，另一 boot 槽未变。按测试流程保留本轮测试 boot：`restored=false`、`test_boot_retained=true`。不公开原始设备身份、boot ID、分区备份或采集日志。
 
-Not verified in this test:
+本轮未验证：
 
-- root filesystem mount or execution of original `launchd`/`dyld`;
-- AMFI/CoreTrust signature-runtime compatibility;
-- SpringBoard, a working iOS UI or a complete system boot.
+- 根文件系统挂载，或原 `launchd` / `dyld` 执行；
+- AMFI/CoreTrust 签名运行时兼容；
+- SpringBoard、可用的 iOS 界面或完整系统启动。
 
-The strict full early-security integration attempt still has **252 unresolved references to 214 distinct targets** across retained components. These are static mapping counts, not executed failures, a progress percentage or an estimate of time remaining.
+严格的完整早期安全集成尝试仍有 **252 处未解析引用，涉及 214 个独立目标**。这些是保留组件中的静态映射计数，不是实际执行失败次数、进度百分比或剩余时间估计。
 
-## Target and current source
+## 目标输入与当前源码
 
-- Target original inputs: iPhone18,3 / v57ap, iOS 27.0.1, build 24A446; original collection Darwin 27 / XNU 13432.2.10.
-- Current native source baseline: XNU 12377.121.6 / Darwin 25.5, compiled for real arm64e. It is not renamed to impersonate Darwin 27; matching symbol names do not establish a compatible private ABI.
-- The current private 32 MiB main-OS RAM-root input contains original launchd and dyld, but not a complete dyld shared cache or SpringBoard. It is not a complete iOS system root.
+- 目标原始输入：iPhone18,3 / v57ap、iOS 27.0.1、构建号 24A446；原 collection 为 Darwin 27 / XNU 13432.2.10。
+- 当前原生源码基线：XNU 12377.121.6 / Darwin 25.5，编译为真实 arm64e。没有改版本字符串冒充 Darwin 27；同名符号不代表私有 ABI 兼容。
+- 当前私有 32 MiB main-OS RAM 根输入包含原 launchd 和 dyld，但没有完整 dyld shared cache 或 SpringBoard，因此不是完整 iOS 系统根。
 
-## Build boundaries
+## 构建边界
 
-There is deliberately no turnkey build or flash command in this snapshot.
+本快照不提供一键构建或刷写命令。
 
-`ArmCpu.cpp` needs the separately integrated `arm/o1_timer_bridge.h` and native XNU platform adaptations. `O1SerialPortLib.inf` references platform PCD declarations in `O1Pkg/O1Pkg.dec`; the mixed integration package is not included here. To integrate these modules, an appropriate licensed XNU/IOKit environment and an EDK II platform package with explicitly reserved, mapped logging RAM and the listed PCDs are required.
+`ArmCpu.cpp` 需要另行集成的 `arm/o1_timer_bridge.h` 和原生 XNU 平台适配。`O1SerialPortLib.inf` 引用了 `O1Pkg/O1Pkg.dec` 中的平台 PCD 声明；本仓库没有包含该混合集成包。集成这些模块需要具备相应许可的 XNU/IOKit 环境，以及明确预留、映射日志 RAM 并提供所列 PCD 的 EDK II 平台包。
 
-The complete local integration still needs private inputs. None of the Apple firmware, signed binaries, kernel collections, userland, dyld caches or stock boot images are supplied. Obtaining any such inputs remains the integrator's responsibility under their applicable licenses. This source license does not grant a license to Apple operating-system software.
+完整本地集成仍依赖私有输入。本仓库不提供 Apple 固件、签名二进制、kernel collection、用户空间、dyld cache 或原厂 boot 镜像。获取和使用这些输入须遵守各自适用的许可；本源码许可不授予 Apple 操作系统软件使用权。
 
-## Safety and non-goals
+## 安全边界与非目标
 
-- Signature, AMFI, CoreTrust and trust-cache failures remain real failures; there is no bypass, forced-success provider, replacement launchd or generic missing-symbol stub in this release.
-- Current hardware experiments are limited to the verified active boot slot of the authorized device. They do not install iOS or authorize GPT, userdata, NV, RPMB, security-store, vbmeta or stock-firmware writes.
-- No slot switching or `fastboot boot` route is used. Recovery is not guaranteed if both device transports become unavailable.
-- Windows/WOA work is maintained separately and is not part of this snapshot.
+- 签名、AMFI、CoreTrust 和信任缓存失败仍按真实失败处理；本发布不包含绕过、强制成功的提供者、替换 launchd 或通用缺失符号替身。
+- 当前实机实验仅限已获授权设备经核验的现役 boot 槽。不安装 iOS，也不涵盖 GPT、userdata、NV、RPMB、安全存储、vbmeta 或原厂固件写入。
+- 不切换槽位，不使用 `fastboot boot` 路线。如果设备的两种传输方式都不可用，无法保证自动恢复。
+- Windows/WOA 工作独立维护，不属于本源码快照。
 
-## Upstream provenance
+## 上游来源
 
-References only; upstream checkouts and private artifacts are not vendored:
+以下仅为来源引用，不打包上游检出目录或私有产物：
 
-| Project | Pinned source revision |
+| 项目 | 固定源码版本 |
 | --- | --- |
 | [UniXNU](https://github.com/UniXNU/UniXNU) | `c96b29975645b711dc06bc435c3ad27321ce817c` |
 | [ArmCpu](https://github.com/UniXNU/ArmCpu) | `93a5030c5d983d0ef90f0fca93879d6e36ad1ba8` |
-| [Apple open-source XNU](https://github.com/apple-oss-distributions/xnu) | `ac9718fb1af618d5ce8678d0dc6e8a58f252216f` |
+| [Apple 开源 XNU](https://github.com/apple-oss-distributions/xnu) | `ac9718fb1af618d5ce8678d0dc6e8a58f252216f` |
 | [EDK II](https://github.com/tianocore/edk2) | `0ea22ef04f3bef379ad15cac46fd9ceaa13d1e9a` |
 
-The XNU checkout and its APSL-covered changes are not redistributed in this first snapshot. Upstream licenses remain applicable to their own files; they are not replaced by this release's module license.
+首批快照不再分发 XNU 检出目录及其 APSL 覆盖的修改。上游许可仍适用于各自文件，不被本发布的模块许可替代。
 
-## Licensing
+## 许可
 
-The eight module files already declare BSD-2-Clause-Patent, or are covered by the included ArmCpu component license. Existing copyright and SPDX notices are retained. `LICENSE` reproduces the license terms without assigning another component's copyright to the UEFI files. See `NOTICE.md` for scope and exclusions.
+这八份模块文件已有 BSD-2-Clause-Patent 声明，或由随附的 ArmCpu 组件许可覆盖。保留现有版权和 SPDX 声明。根目录 `LICENSE` 提供许可条款，不将其他组件的版权声明套到 UEFI 文件上。具体适用范围与排除项见 `NOTICE.md`。
