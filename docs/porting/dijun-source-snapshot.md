@@ -1,42 +1,100 @@
-# dijun source snapshot and test status
+# dijun source snapshot and latest hardware status
 
 [简体中文](../zh/porting/dijun-source-snapshot.md) · [Repository overview](../../README.md)
 
-## Scope
+Updated **2026-11-11; the latest completed hardware test is phone36**.
 
-This is an experimental source-module snapshot for Xiaomi 15S Pro (`dijun`, XRING O1), not a supported-device entry, a complete kernel or firmware, an installation package or a working iOS system.
+## Current conclusion
 
-Eight existing BSD-2-Clause-Patent source files are published unchanged: the ArmCpu CPU/GIC/timer module, EFI Serial I/O driver, RAM-first serial-output library and their metadata/license. `source-manifest.json` records exact sizes and SHA-256 hashes.
+**iOS has not booted. Execution still stops during original Sandbox initialization. There is no evidence of original Apple launchd/dyld user-code execution, SpringBoard, or an iOS system UI.**
 
-## Hardware test 13 — 2026-11-08
+The graphical UniXNU menu is a bootloader UI. Compilation, prelinking, checkpoints, and returning to Android are not proof of iOS system boot. This repository is not a flashable ROM, installer, or validated upstream supported-device entry.
 
-The continuous kernel-to-userspace attempt used a fresh native arm64e build. Mapping was complete for the selected original v1 AppleImage4/corecrypto diagnostic subset, with no missing-symbol stubs. This subset did not include the complete AMFI/Sandbox dependency closure.
+## Latest hardware endpoint
 
-The test ended at:
+Test 36 used a freshly built native arm64e kernel, retained the original AMFI/Sandbox/Image4/corecrypto dependency closure, and explicitly used bring-up diagnostic admission.
 
-```text
-Stage83 / error 0xe802
-trust_cache_runtime_init → panic("amfi interface not available @%s:%d")
-```
+Its record is `Stage83 / error 0xe802`, with the unmapped-call observer stopping at an original Sandbox **OSDecrementAtomic** call. The original interface atomically decrements a 32-bit counter and returns its previous value; that target is not yet admitted into this candidate's mapping.
 
-The callsite was verified against that exact test collection. Passing the earlier Image4-null guard is not proof of full Image4 runtime compatibility or signature acceptance.
+Stage83 is the terminal fault-capture return identifier, not a claim that 83 initialization stages completed. Progress is determined from the actual call target and same-boot evidence.
 
-Android returned normally. The installed test boot's complete device-side hash was verified, the other boot slot was unchanged, and the test boot was retained (`restored=false`, `test_boot_retained=true`). No raw logs, partition backups or device identifiers are published.
+- Android returned normally on the same device, with boot completion verified.
+- The complete installed test boot's device-side SHA-256 matched the candidate, and the unwritten boot slot remained unchanged.
+- The verified test boot was retained: `restored=false`, `test_boot_retained=true`.
+- The original image backup remains available for abnormal recovery; availability is not reported as completed restoration.
 
-**Original Apple userspace execution, root mount, SpringBoard and an iOS system UI have not been verified. iOS has not booted.** The complete early-security integration attempt remains blocked by 252 unresolved references to 214 distinct targets. Those are static counts, not a percentage of work remaining.
+Device serial numbers, boot IDs, raw console/pstore logs, partition backups, and test images are not published.
 
-## Rebuild and licensing boundaries
+## From diagnosed faults to the current blocker
 
-Target original inputs are iPhone18,3 / v57ap, iOS 27.0.1 (24A446), Darwin 27 / XNU 13432.2.10. The native source is XNU 12377.121.6 / Darwin 25.5; its version is not changed to impersonate the target.
+| Hardware test | Observation and correction | Evidence limit |
+| --- | --- | --- |
+| phone28 | Bounded panic capture obtained the real data-abort cause: original NULL-safe static safeMetaCast had been misbound to a member metaCast without a NULL guard | Similar authentication/type-walk shape is not NULL-semantic equivalence |
+| phone30 | Corrected safeMetaCast and removed the fixed-zero code-signing substitute; original AMFI explicitly rejected missing amfi-only-platform-code input | Policy values must be traced, not guessed |
+| phone31 | Transported only that four-byte property from the original v57ap DeviceTree template verified against the official manifest | A static template is not live iPhone security-state evidence; SecureDT remained unmapped |
+| phone32 | Added guarded genuine SecureDT lookup/property calls; the observer advanced to original Sandbox filter-mask count queries | Not proof that all AMFI or Sandbox initialization completed |
+| phone34 | Queried actual BSD syscall, Mach trap, and MIG kobject counts; the observer advanced to a VM page-mask query | Counts come from real tables and normal MIG initialization, not fabricated constants |
+| phone35 | Reused the genuine VM page-mask boundary and verified the native kernel_map input; the observer advanced to atomic increment | Original private map offsets are not reused |
+| phone36 | Called genuine OSIncrementAtomic through a guarded boundary, preserving relaxed ordering and the previous-value return | The next blocker is an unmapped OSDecrementAtomic call |
 
-The private 32 MiB RAM-root input has original launchd/dyld but lacks a complete dyld cache and SpringBoard. The published snapshot also lacks the timer bridge and platform PCD integration needed for an independent build. It cannot reproduce the complete private test image on its own.
+Each listed normal return has separate local candidate hashes and same-boot records. Historical mismatched candidates and packages never tested on hardware are not counted as successful verification.
 
-Apple binaries, firmware, retained Apple machine-code leaves, corecrypto implementation, private userland, keys, credentials, device logs, backups and mixed Windows/WOA integration are excluded. Existing copyright and license notices remain intact. These module licenses do not grant rights to Apple operating-system software.
+## Retracted identities and reliability corrections
 
-No signature, AMFI, CoreTrust or trust-cache check is relaxed. No generic missing-symbol stub or replacement launchd is used to claim success.
+### Panic-record overflow
 
-## How the UniXNU documentation rules apply
+The old observer appended a PC/LR suffix before checking capacity. It could overrun the 128-byte text area and corrupt the following boot/recovery state, producing two stalls requiring manual fastboot. A frozen-source repair preserves the readable-page policy, parameter ABI, and recovery-record layout.
 
-The [official documentation contribution guide](https://unixnu.com/zh/contributing/documentation#%E6%96%B0%E5%A2%9E%E9%A1%B5%E9%9D%A2) requires paired English and Chinese Markdown pages, navigation registration and reachable body links for manual pages in the **UniXNU main documentation repository**. This snapshot provides paired, mutually linked Markdown pages and a README entry point; it is not that VitePress site, and its upstream sidebar is not modified.
+The exact repaired function was exercised using an explicit Darwin-cursor host model, with GCC/Clang plain and ASan/UBSan builds. All four builds passed **664 cases each**, covering long formats, NULL/unreadable cursors, byte-by-byte complete-format mutations, and recovery-state canaries. **This is host bounds coverage, not ARM/PAC runtime or Apple userspace execution evidence.** Subsequent phone28 returned normally and captured a precise fault.
 
-The [repository guide](https://unixnu.com/zh/contributing/repository) and [porting-record guide](https://unixnu.com/zh/porting/records) distinguish component repositories from format-2 device repositories. A real device registration requires a matching `board.toml`, full configuration and a validated `porting.toml`. This limited module set does not satisfy that contract: no device record is fabricated and no supported-device entry, catalog scan or upstream merge is claimed.
+### Device-switch query
+
+The read-only bdevsw_isfree interface had been misidentified as bdevsw_add. A NULL-to-zero-switch substitute changed registration and failure behavior. That binding was retracted and replaced with the genuine read-only free-slot query, preserving the nonzero PAC-signed error-callback sentinel and the separate true registration call.
+
+### Nullable cast
+
+Original static safeMetaCast cannot be replaced by member metaCast. The new guarded boundary calls the real static NULL-safe API, returns the same borrowed pointer or NULL, and adds no retain/release or type-authentication relaxation.
+
+### Code-signing configuration
+
+The original function was not a class-pattern/no-match dispatcher. It reads, caches, and publishes code-signing configuration. A fixed-zero substitute had no equivalence proof and was removed from new kernels. The complete real native platform query is verified without fabricating TXM/production state or concealing exemption bits. Native/original platform differences remain explicit; full private-ABI equivalence is not claimed.
+
+### Relocation proof
+
+Negative tests found that the old layout fallback could accept a PAC-to-NOP mutation alongside address changes. It now permits only exact-target-identity address-immediate re-encodings. PAC, arithmetic, conditional, and failure-path changes must fail. When an intermediate baseline is required, both complete function/target proofs are retained instead of skipping checks.
+
+phone29 and phone33 were locally rejected before device testing. They are not successful hardware trials. Historical records remain available locally, and stale admission must not be reused for flashing.
+
+## Static closure and normal-launch admission
+
+The test-36 candidate still has **306 distinct unmapped targets and 492 component-target entries**. A shared target can contribute entries in multiple components. These are static counts, not execution failures, work percentages, or time estimates.
+
+The previously published test 13 used a smaller AppleImage4/corecrypto subset; its contemporary full-security attempt had 252 references to 214 targets. Closure scope and counting units differ, so those values cannot establish a progress rate or regression.
+
+Current admission distinguishes:
+
+- **Bring-up diagnostics:** the complete early-security component closure can remain incompletely mapped. The official unmapped-call reporter records and terminates; it does not return fixed success. Original AMFI registration runs at an explicit early initializer.
+- **Normal-launch candidates:** complete mapping, no reporting stub or early initializer, and a qualified full security-provider ABI are mandatory. The current candidate does not satisfy this gate.
+
+Original security-extension code, signature checks, and normal failure paths remain intact. Early registration, one TrustCache initializer returning, or diagnostic progress does not prove signed-load ABI, CoreTrust acceptance, or normal secure boot.
+
+## Remaining work
+
+1. Admit the actual OSDecrementAtomic contract, then continue from real earliest blockers through kernel interfaces, object/callback/PAC contracts, and lifetimes. Names alone are insufficient.
+2. Qualify the full AMFI/TrustCache signed-load and runtime ABI, including the unproved immutable-runtime +40 callback producer.
+3. Transport a complete original iOS system root and dyld shared cache; prove actual PID1/exec/EL0 and subsequent services. The current 32 MiB RAM root is a minimal original launchd/dyld input, not a complete system.
+4. Complete iOS-side display, touch, storage, graphics, and other device services. Bootloader rendering does not establish iOS graphics support.
+
+No number of remaining trials or completion deadline is promised. Kernel, root, exec, original user-code execution, and UI evidence must be recorded separately.
+
+## GitHub update and licensing scope
+
+Only the eight existing BSD-2-Clause-Patent module paths in source-manifest.json are published unchanged: ArmCpu, EFI Serial I/O, and the RAM-first output library. Their bytes have not changed in this update; the Chinese README and paired status/correction pages are updated.
+
+Unreviewed XNU/APSL modifications, integration templates/tools, firmware/binaries/machine code, userspace, device logs/identities, credentials, partition backups, and Windows/WOA integration remain excluded. This snapshot lacks the timer bridge and platform PCD integration needed to independently reproduce the complete test image. It supplies no one-command build or flashing instructions. See [NOTICE.md](../../NOTICE.md).
+
+## Application of UniXNU documentation rules
+
+This page follows the [official documentation guide](https://unixnu.com/zh/contributing/documentation) principles of paired language pages and reachable body links. It is an independent module repository, not a UniXNU VitePress submission; no upstream navigation changes or merge are claimed.
+
+The [repository guide](https://unixnu.com/zh/contributing/repository) and [porting-record guide](https://unixnu.com/zh/porting/records) require consistent format-2 metadata and validation for supported devices. This limited module snapshot does not satisfy that registration contract. No porting.toml or support status is fabricated.

@@ -1,4 +1,4 @@
-# Source-only release: exclude any subsequently created private inputs.
+# Source-only release: exclude private inputs and generated artifacts.
 artifacts/
 vendor/
 .zcode/

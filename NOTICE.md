@@ -1,20 +1,32 @@
-# License and release scope
+# 许可与发布范围 / License and publication scope
 
-## Included source
+## 纳入的模块源码
 
-Only the eight exact paths in `source-manifest.json` are included as module source. They are copied byte-for-byte from the reviewed local files. All have an existing BSD-2-Clause-Patent declaration or, for ArmCpu matching metadata, the included component license.
+仅 `source-manifest.json` 中的八份确切路径作为模块源码公开，均保留既有 BSD-2-Clause-Patent 声明或 ArmCpu 组件许可。此次进度同步不扩大模块集，也不修改其字节。
 
-- ArmCpu retains `Copyright (c) 2026, ArmCpu contributors. All rights reserved.` and its component `LICENSE`.
-- The UEFI serial files retain their existing SPDX declarations. No ArmCpu copyright statement is added to those files and no unstated author identity is invented.
-- The root `LICENSE` supplies the existing license's terms. It does not relicense any excluded file or grant rights to Apple operating-system software.
-- The newly written release documentation and manifests are provided under BSD-2-Clause-Patent as part of this source-only snapshot. Original source attribution remains unchanged.
+- ArmCpu 保留现有版权与原组件 `LICENSE`。
+- UEFI 串口模块保留原 SPDX 声明，不添加未声明的作者身份或错误移用 ArmCpu 版权。
+- 根 `LICENSE` 提供现有许可条款，不重新许可被排除的文件，不授予 Apple 操作系统软件使用权。
+- 新写的发布文档与清单按 BSD-2-Clause-Patent 作为源码快照的一部分提供。
 
-## Explicit exclusions
+## 明确排除
 
-No Apple firmware, IPSW, kernelcache or retained Apple machine-code leaf is redistributed. No corecrypto implementation, private userland, launchd, dyld, shared cache, signed binary, partition image, device log, device serial/boot ID, key, token, credential or private authorization record is included.
+不再分发 Apple 固件、IPSW、kernelcache、保留 Apple 机器码、corecrypto 实现、launchd、dyld、共享缓存、签名二进制、分区镜像、设备日志、设备序列号/boot ID、密钥、凭据、私人授权或编辑器/session数据。
 
-Unlicensed local templates, XNU/APSL modifications not yet selected for redistribution, build artifacts, integration configurations with private inputs, vendor downloads, editor/session data and mixed Windows/WOA source are excluded. A directory name, source extension or lack of a secret-scanner alert is not enough for inclusion; the explicit reviewed manifest controls the release.
+没有完成再分发核准的 XNU/APSL 修改、本地集成模板/构建配置/测试产物、vendor下载和混合Windows/WOA源码保持排除。文件扩展名、目录存在或未被秘密扫描命中本身不是许可证明；明确模块清单决定发布范围。
 
-## Status
+## 状态与证据范围
 
-This repository is an early module-source snapshot. It does not contain a complete firmware, kernel build pipeline or runnable iOS system. The test result in `README.md` and the paired English/Chinese status pages is a sanitized factual description, not a claim that the published module set independently reproduces the full private test image. The paired pages follow the official documentation naming and language conventions where applicable; this independent source repository is not an upstream VitePress documentation submission or a validated format-2 supported-device entry.
+这是有限模块源码快照，不包含独立完整内核/固件构建流程或已启动的iOS。README与中英文页面提供脱敏实测摘要，不声称公开八份模块可独立复现本地测试镜像。
+
+截至2026-11-11，最新phone36测试仍在原Sandbox初始化的未映射OSDecrementAtomic调用处终止。原Apple用户空间尚未执行。诊断入口、编译/匹配/回归通过或Android返回不是系统启动证明。错误的历史接口映射在新文档中明确撤回，不继续当作等价实现成果。
+
+本地诊断使用fail-stop未映射调用记录及明确的原AMFI早期注册；这些机制不作为正常启动完成或签名验收成功的证据，也没有在本源码快照中打包Apple代码或扩大未核准源码发布范围。
+
+## English summary
+
+Only the eight exact module paths in `source-manifest.json` are included. They retain their existing BSD-2-Clause-Patent notices or ArmCpu component license and remain byte-identical in this update. New status documentation and manifests use the same documentation license; excluded files are not relicensed.
+
+Apple firmware/binaries/machine-code leaves, corecrypto implementation, userspace, partition images, device identities/logs, secrets, private authorizations, unreviewed integration code and Windows/WOA sources remain excluded.
+
+This snapshot is not a complete build pipeline or working iOS distribution. The latest local phone36 test still stops during original Sandbox initialization at an unmapped OSDecrementAtomic call. Original Apple userspace has not executed. Historical mis-mappings are explicitly corrected, and diagnostic progress is not presented as system boot or signature acceptance.

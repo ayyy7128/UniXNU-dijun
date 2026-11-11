@@ -1,5 +1,18 @@
 {
-  "scope": "Explicitly reviewed BSD-licensed source modules only; not a complete firmware or iOS system",
+  "scope": "Explicitly reviewed BSD-licensed source modules and sanitized status through local hardware test36; not a complete firmware or iOS system",
+  "status_updated": "2026-11-11",
+  "latest_completed_hardware_test": 36,
+  "module_source_bytes_unchanged": true,
+  "status_summary": {
+    "endpoint": "Original Sandbox initialization: unmapped OSDecrementAtomic call",
+    "original_apple_userspace_executed": false,
+    "ios_system_ui_verified": false,
+    "android_return_and_full_test_boot_hash_verified": true,
+    "distinct_unmapped_targets": 306,
+    "component_target_entries": 492,
+    "static_counts_are_not_remaining_work_estimates": true,
+    "diagnostic_bringup_is_not_normal_launch_qualification": true
+  },
   "source_bytes": 37925,
   "source_files": [
     {
